@@ -1,6 +1,10 @@
 package com.mygdx.game;
 
+import java.util.LinkedList;
+
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
+import com.mygdx.game.Pacman.DotEattenListener;
 
 public class Pacman {
     private Vector2 position;
@@ -13,7 +17,11 @@ public class Pacman {
     public static final int DIRECTION_RIGHT = 2;
     public static final int DIRECTION_DOWN = 3;
     public static final int DIRECTION_LEFT = 4;
-    
+    private LinkedList<DotEattenListener> listeners;
+
+    public interface DotEattenListener {
+    	void notifyDotEatten();
+    }
     public static final int SPEED = 5;	
     private static final int [][] DIR_DIFF = new int [][] {
         {0,0},
@@ -27,6 +35,7 @@ public class Pacman {
         position = new Vector2(x,y);
         currentDirection = DIRECTION_STILL;
         nextDirection = DIRECTION_STILL;
+        listeners = new LinkedList<DotEattenListener>();
     }  
     public void move(int dir) { 
     	position.x += SPEED * DIR_DIFF[dir][0];
@@ -59,7 +68,7 @@ public class Pacman {
             }
     		if(maze.hasDotAt(currentRow, currentCol)){
     			maze.removeDotAt(currentRow, currentCol);
-    			world.increaseScore();
+    			notifyDotEattenListeners();
     		}
     	}
     	position.x += SPEED * DIR_DIFF[currentDirection][0];
@@ -69,5 +78,14 @@ public class Pacman {
     	int blockSize = WorldRenderer.BLOCK_SIZE;
     	return ((((int)position.x - blockSize/2) % blockSize) == 0) &&
                 ((((int)position.y - blockSize/2) % blockSize) == 0);
+    }
+    public void registerDotEattenListener(DotEattenListener l) {
+        listeners.add(l);
+    }
+ 
+    private void notifyDotEattenListeners() {
+        for(DotEattenListener l : listeners) {
+            l.notifyDotEatten();
+        }
     }
 }

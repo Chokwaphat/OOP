@@ -10,8 +10,19 @@ public class World {
         maze = new Maze();
         pacman = new Pacman(60,60,this);
         score = 0;
+        registerDotEattenListener();
     }
-    public int getScore() {
+    private void registerDotEattenListener() {
+		// TODO Auto-generated method stub
+    	pacman.registerDotEattenListener(new Pacman.DotEattenListener() {
+            @Override
+            public void notifyDotEatten() {
+                score += 1;
+            }
+        });
+		
+	}
+	public int getScore() {
     	return score;
     }
     Pacman getPacman() {
